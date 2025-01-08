@@ -18,13 +18,12 @@ public class App
 
         System.out.println(allUsers);
 
-        User user = new User((long) 3, "James", "Brown", (byte) 25);
+        User user = new User(3L, "James", "Brown", (byte) 25);
         communication.saveUser(user);
 
-        user.setName("Thomas");
-        user.setLastName("Shelby");
+        User user2 = new User(3L, "Thomas", "Shelby", (byte) 29);
 
-        communication.saveUser(user);
+        communication.updateUser(user2);
 
         communication.deleteUser(3);
     }

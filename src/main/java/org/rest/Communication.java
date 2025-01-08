@@ -18,9 +18,11 @@ import java.util.stream.Collectors;
 public class Communication {
 
     private final RestTemplate restTemplate;
+    HttpHeaders headers = new HttpHeaders();
     private final String URL = "http://94.198.50.185:7081/api/users";
     private String cookies;
     private String result = "";
+
 
 
     @Autowired
@@ -37,23 +39,32 @@ public class Communication {
             cookies = setCookiesHeaders.stream().collect(Collectors.joining(";"));
         }
         List<User> allUser = responseEntity.getBody();
+        System.out.println(responseEntity.getStatusCode());
         return allUser;
     }
     public void saveUser(User user) {
-        HttpHeaders headers = new HttpHeaders();
-            headers.set("Cookie", cookies);
+        Long id = user.getId();
 
-        if (user.getId() != null) {
+        headers.set("Cookie", cookies);
+
+        if (id != 0) {
             HttpEntity<User> userHttpEntity = new HttpEntity<>(user, headers);
 
             ResponseEntity<String> responseEntity =
                     restTemplate.postForEntity(URL, userHttpEntity, String.class);
+            System.out.println(responseEntity.getBody());
             result += responseEntity.getBody();
-        } else {
-            HttpEntity<User> requestEntity = new HttpEntity<>(user, headers);
-            restTemplate.put(URL, requestEntity);
+            System.out.println(responseEntity.getStatusCode());
         }
+    }
+    public void updateUser(User user) {
+        HttpEntity<User> requestEntity = new HttpEntity<>(user, headers);
+        ResponseEntity<String> responseEntity = restTemplate.
+                exchange(URL, HttpMethod.PUT, requestEntity, String.class);
 
+        restTemplate.put(URL, requestEntity);
+        result += responseEntity.getBody();
+        System.out.println(responseEntity.getBody());
     }
     public void deleteUser(int id) {
         HttpHeaders headers = new HttpHeaders();
@@ -64,7 +75,9 @@ public class Communication {
 
         ResponseEntity<String> responseEntity =
                 restTemplate.exchange(URL + "/" + id, HttpMethod.DELETE, httpEntity, String.class);
+        System.out.println(responseEntity.getBody());
         result += responseEntity.getBody();
+        System.out.println(responseEntity.getStatusCode());
         System.out.println(result);
     }
 }
